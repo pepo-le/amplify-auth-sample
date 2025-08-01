@@ -75,8 +75,6 @@ export default function Login({ onSignInSuccess }: LoginProps) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f5f5f5",
       }}
     >
       <div
