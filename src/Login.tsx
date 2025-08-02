@@ -75,10 +75,15 @@ export default function Login({ onSignInSuccess }: LoginProps) {
   };
 
   const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError("");
+    
     try {
       await signInWithRedirect({ provider: "Google" });
     } catch (err) {
+      console.error("Google sign in error:", err);
       setError((err as Error).message || "Googleログインに失敗しました");
+      setLoading(false);
     }
   };
 
@@ -126,22 +131,24 @@ export default function Login({ onSignInSuccess }: LoginProps) {
             <button
               type="button"
               onClick={handleGoogleSignIn}
+              disabled={loading}
               style={{
                 padding: "0.75rem",
                 backgroundColor: "#db4437",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "0.5rem",
                 fontSize: "0.9rem",
+                opacity: loading ? 0.7 : 1,
               }}
             >
               <span>G</span>
-              Googleでログイン
+              {loading ? "認証中..." : "Googleでログイン"}
             </button>
 
             <div

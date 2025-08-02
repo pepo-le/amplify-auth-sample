@@ -29,10 +29,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // OAuth リダイレクト後の認証状態変更を監視
     const unsubscribe = Hub.listen('auth', (data) => {
       const { payload } = data;
-      if (payload.event === 'signInWithRedirect') {
-        checkAuthState();
+      console.log('Auth Hub event:', payload.event, payload);
+      
+      switch (payload.event) {
+        case 'signInWithRedirect':
+        case 'signInWithRedirect_failure':
+        case 'signedIn':
+          checkAuthState();
+          break;
+        case 'signedOut':
+          setUser(null);
+          setIsLoading(false);
+          break;
       }
     });
+
+    // URLパラメータでエラーがある場合の処理
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const errorDescription = urlParams.get('error_description');
+    
+    if (error) {
+      console.error('Auth error from URL:', error, errorDescription);
+      // エラーパラメータをクリア
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     return unsubscribe;
   }, []);

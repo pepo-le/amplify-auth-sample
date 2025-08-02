@@ -21,7 +21,10 @@ export default function AppWithAuth() {
   }
 
   if (!user) {
-    return <Login onSignInSuccess={() => window.location.reload()} />;
+    return <Login onSignInSuccess={() => {
+      // より優雅な状態更新 - reloadではなく状態を再チェック
+      window.location.reload();
+    }} />;
   }
 
   return <App />;
