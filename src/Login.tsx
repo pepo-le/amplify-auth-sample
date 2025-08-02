@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { signIn, signUp, confirmSignUp } from "aws-amplify/auth";
+import {
+  signIn,
+  signUp,
+  confirmSignUp,
+  signInWithRedirect,
+} from "aws-amplify/auth";
 
 interface LoginProps {
   onSignInSuccess: () => void;
@@ -69,6 +74,14 @@ export default function Login({ onSignInSuccess }: LoginProps) {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithRedirect({ provider: "Google" });
+    } catch (err) {
+      setError((err as Error).message || "Googleログインに失敗しました");
+    }
+  };
+
   return (
     <div
       style={{
@@ -107,63 +120,105 @@ export default function Login({ onSignInSuccess }: LoginProps) {
         )}
 
         {mode === "signin" && (
-          <form
-            onSubmit={handleSignIn}
+          <div
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
           >
-            <input
-              type="email"
-              placeholder="メールアドレス"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                padding: "0.75rem",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-              }}
-            />
-            <input
-              type="password"
-              placeholder="パスワード"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                padding: "0.75rem",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-              }}
-            />
             <button
-              type="submit"
-              disabled={loading}
+              type="button"
+              onClick={handleGoogleSignIn}
               style={{
                 padding: "0.75rem",
-                backgroundColor: "#007bff",
+                backgroundColor: "#db4437",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: loading ? "not-allowed" : "pointer",
-              }}
-            >
-              {loading ? "ログイン中..." : "ログイン"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("signup")}
-              style={{
-                padding: "0.75rem",
-                backgroundColor: "transparent",
-                color: "#007bff",
-                border: "1px solid #007bff",
-                borderRadius: "4px",
                 cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                fontSize: "0.9rem",
               }}
             >
-              新規登録はこちら
+              <span>G</span>
+              Googleでログイン
             </button>
-          </form>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                margin: "1rem 0",
+                color: "#666",
+              }}
+            >
+              <div
+                style={{ flex: 1, height: "1px", backgroundColor: "#ddd" }}
+              />
+              <span style={{ padding: "0 1rem" }}>または</span>
+              <div
+                style={{ flex: 1, height: "1px", backgroundColor: "#ddd" }}
+              />
+            </div>
+
+            <form
+              onSubmit={handleSignIn}
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <input
+                type="email"
+                placeholder="メールアドレス"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{
+                  padding: "0.75rem",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                }}
+              />
+              <input
+                type="password"
+                placeholder="パスワード"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  padding: "0.75rem",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: "0.75rem",
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+              >
+                {loading ? "ログイン中..." : "メールでログイン"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("signup")}
+                style={{
+                  padding: "0.75rem",
+                  backgroundColor: "transparent",
+                  color: "#007bff",
+                  border: "1px solid #007bff",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                新規登録はこちら
+              </button>
+            </form>
+          </div>
         )}
 
         {mode === "signup" && (

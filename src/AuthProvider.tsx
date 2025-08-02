@@ -5,6 +5,7 @@ import {
   type ReactNode,
 } from "react";
 import { getCurrentUser, type AuthUser } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -24,6 +25,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     checkAuthState();
+
+    // OAuth リダイレクト後の認証状態変更を監視
+    const unsubscribe = Hub.listen('auth', (data) => {
+      const { payload } = data;
+      if (payload.event === 'signInWithRedirect') {
+        checkAuthState();
+      }
+    });
+
+    return unsubscribe;
   }, []);
 
   const checkAuthState = async () => {
